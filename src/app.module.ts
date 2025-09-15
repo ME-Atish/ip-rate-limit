@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { IpTrackerController } from './modules/api-tracker/ip-tracker.controller';
+import { IpTrackerService } from './modules/api-tracker/ip-tracker.service';
+import { IpTrackerModule } from './modules/api-tracker/ip-tracker.module';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [IpTrackerModule],
+  controllers: [IpTrackerController],
+  providers: [IpTrackerService],
 })
 export class AppModule {}
