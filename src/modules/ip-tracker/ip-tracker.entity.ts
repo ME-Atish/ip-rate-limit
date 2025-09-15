@@ -9,7 +9,7 @@ export class IpRecord {
   ip: string;
 
   @Column({ type: 'timestamp' })
-  widowStart: Date;
+  windowStart: Date;
 
   @Column()
   requestCount: number;
