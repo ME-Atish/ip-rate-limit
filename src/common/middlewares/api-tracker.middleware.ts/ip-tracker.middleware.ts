@@ -7,6 +7,7 @@ import { IpTrackerService } from 'src/modules/ip-tracker/ip-tracker.service';
 export class IpTrackerMiddlewareMiddleware implements NestMiddleware {
   constructor(private readonly ipTrackerService: IpTrackerService) {}
   async use(req: Request, res: Response, next: NextFunction) {
+    // Req.ip have user's/client's IP
     await this.ipTrackerService.tracker(req.ip!);
     next();
   }

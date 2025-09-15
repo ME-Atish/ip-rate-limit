@@ -17,9 +17,11 @@ export class IpTrackerService {
   ) {}
 
   async tracker(ip: string) {
+    // Get time which user sent request
     const nowTime = new Date();
+    // Convert time zone to Tehran (Iran's Capital)
     const nowTimeTh = new Date(nowTime.getTime() + this.tehranTimeZone);
-
+    // Find the IP record in the database that matches the given IP address
     let record = await this.ipRecordRepository.findOne({ where: { ip } });
 
     if (!record) {
@@ -31,6 +33,7 @@ export class IpTrackerService {
       await this.ipRecordRepository.save(record);
     }
 
+    // If request reached to maximum request, these codes will run
     if (record.isBlocked && record.blockUntil && nowTime < record.blockUntil) {
       throw new HttpException(
         {
@@ -42,6 +45,7 @@ export class IpTrackerService {
       );
     }
 
+    // Calculate the end time of the current request window based on the start time, window duration, and Tehran timezone offset
     const windowEnd = new Date(
       record.windowStart.getTime() +
         this.windowMinute * 60 * 1000 +
@@ -49,11 +53,15 @@ export class IpTrackerService {
     );
 
     if (nowTimeTh > windowEnd) {
+      // If the current time exceeds the rate limit window, reset the request count
+      // and start a new window
       record.requestCount = 1;
       record.windowStart = nowTimeTh;
     } else {
+      // Otherwise, increment the request count
       record.requestCount += 1;
 
+      // If the count reaches the maximum allowed, block the IP for `blockMinute` duration
       if (record.requestCount >= this.maxRequest) {
         record.isBlocked = true;
         record.blockUntil = new Date(
